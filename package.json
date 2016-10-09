@@ -20,7 +20,9 @@
   },
   "homepage": "https://github.com/Kanuny/art_pwnz_server#readme",
   "dependencies": {
-    "koa": "^2.0.0-alpha.7"
+    "koa": "^2.0.0-alpha.7",
+    "mysql": "^2.11.1",
+    "sequelize": "^3.24.3"
   },
   "devDependencies": {
     "babel-cli": "^6.16.0",
