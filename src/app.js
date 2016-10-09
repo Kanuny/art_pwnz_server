@@ -1,13 +1,9 @@
-import express from 'express';
-import morgan from 'morgan';
+import Koa from 'koa';
 
-const app = express();
+const app = new Koa();
 
-app.use(morgan('combined'));
-
-app.get('/', (req, res) => {
-  res.send('hello world');
+app.use((ctx) => {
+  ctx.body = 'Hello World';
 });
-app.listen(3000, () => {
-  console.log('server listen on 3000');
-});
+
+app.listen(3000);
