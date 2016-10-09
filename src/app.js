@@ -1,9 +1,11 @@
 // @flow
 import Koa from 'koa';
 
+import type { Koa$Context } from './types';
+
 const app = new Koa();
 
-app.use((ctx) => {
+app.use((ctx: Koa$Context) => {
   ctx.body = 'Hello World';
 });
 
