@@ -8,4 +8,7 @@ const dbName = process.env.DB_NAME || 'test_art_pwnz';
 
 export default new Sequelize(dbName, userName, password, {
   dialect: 'mysql',
+  define: {
+    timestamps: false,
+  },
 });
