@@ -14,6 +14,8 @@ const Article = sequelize.define('article', {
   year: STRING,
   genre: STRING,
   forSale: BOOLEAN,
+  postName: STRING,
+  postDescription: STRING,
 }, {
   timestamps: false
 });

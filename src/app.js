@@ -10,7 +10,9 @@ import router from './routes/routes';
 const app = new Koa();
 
 app.use(cors());
-app.use(koaBody());
+app.use(koaBody({
+  jsonLimit: 52428800,
+}));
 
 sequelize.sync({ force: true });
 
