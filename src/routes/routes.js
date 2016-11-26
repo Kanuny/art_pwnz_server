@@ -10,7 +10,7 @@ const router = koaRouter();
 router.get('/articles', async (ctx, next) => {
   const articles = await Article.findAll({
   include: [
-    { model: Image },
+    { model: Image, where: { name: 'preview'} },
   ]
 });
 

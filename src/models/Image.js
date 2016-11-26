@@ -1,12 +1,12 @@
 // @flow
-import { STRING, DATE } from 'sequelize';
+import { STRING, TEXT, DATE } from 'sequelize';
 
 import sequelize from '../helpers/sequelize'; 
 
 const Image = sequelize.define('image', {
-  preview: STRING,
+  preview: TEXT('long'),
   name: STRING,
-  fullScreen: STRING,
+  fullScreen: TEXT('long'),
   createdAt: DATE,
 });
 
