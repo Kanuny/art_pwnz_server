@@ -10,13 +10,19 @@ const router = koaRouter();
 router.get('/articles', async (ctx, next) => {
   const articles = await Article.findAll({
   include: [
-    { model: Image, where: { name: 'preview'} },
-  ]
+    {
+      model: Image,
+      attributes: ['preview', 'name'],
+      where: { name: 'preview'},
+    },
+  ],
+  order: [['createdAt', 'DESC']],
 });
 
   ctx.body = articles;
   await next();
 });
+
 async function getPreview(img) {
   const base64Data = img.replace(/^data:image\/png;base64,/, '');
   const jimpImg = await jimp.read(new Buffer(base64Data, 'base64'));
