@@ -6,8 +6,11 @@ import Article from '../models/Article';
 import Image from '../models/Image';
 
 const router = koaRouter();
+const pageCount = 15;
 
 router.get('/articles', async (ctx, next) => {
+  const { page } = ctx.request.query;
+  const offset = (page || 0) * pageCount;
   const articles = await Article.findAll({
   include: [
     {
@@ -16,7 +19,11 @@ router.get('/articles', async (ctx, next) => {
       where: { name: 'preview'},
     },
   ],
-  order: [['createdAt', 'DESC']],
+  order: [
+    ['createdAt', 'DESC']
+  ],
+  offset,
+  limit: pageCount,
 });
 
   ctx.body = articles;
