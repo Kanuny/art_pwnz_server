@@ -8,8 +8,25 @@ import Image from '../models/Image';
 const router = koaRouter();
 const pageCount = 15;
 
+router.get('/articles/:id', async (ctx, next) => {
+  const { id } = ctx.params;
+  const article = await Article.findById(id, {
+    include: [
+      {
+        model: Image,
+        attributes: ['name', 'id'],
+      },
+    ],
+  });  
+
+  ctx.body = article;
+  await next();
+})
+
 router.get('/articles', async (ctx, next) => {
   const { page } = ctx.request.query;
+  console.log(page);
+
   const offset = (page || 0) * pageCount;
   const articles = await Article.findAll({
   include: [
