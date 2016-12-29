@@ -8,6 +8,27 @@ import Image from '../models/Image';
 const router = koaRouter();
 const pageCount = 15;
 
+router.get('/images/:id', async (ctx, next) => {
+  const { id } = ctx.params;
+  const image = await Image.findById(id);
+
+  ctx.body = image;
+
+  await next();
+});
+
+router.del('/articles/:id', async (ctx, next) => {
+  const { id } = ctx.params;
+  await Article.update({
+    removed: true,
+  }, {
+    where: { id },
+  });
+
+  ctx.status = 200;
+  await next();  
+});
+
 router.get('/articles/:id', async (ctx, next) => {
   const { id } = ctx.params;
   const article = await Article.findById(id, {
@@ -25,23 +46,23 @@ router.get('/articles/:id', async (ctx, next) => {
 
 router.get('/articles', async (ctx, next) => {
   const { page } = ctx.request.query;
-  console.log(page);
 
   const offset = (page || 0) * pageCount;
   const articles = await Article.findAll({
-  include: [
-    {
-      model: Image,
-      attributes: ['preview', 'name'],
-      where: { name: 'preview'},
-    },
-  ],
-  order: [
-    ['createdAt', 'DESC']
-  ],
-  offset,
-  limit: pageCount,
-});
+    where: { removed: false || null },
+    include: [
+      {
+        model: Image,
+        attributes: ['preview', 'name'],
+        where: { name: 'preview'},
+      },
+    ],
+    order: [
+      ['createdAt', 'DESC']
+    ],
+    offset,
+    limit: pageCount,
+  });
 
   ctx.body = articles;
   await next();
