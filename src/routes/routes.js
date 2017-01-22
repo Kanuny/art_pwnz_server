@@ -4,6 +4,7 @@ import jimp from 'jimp';
 
 import Article from '../models/Article';
 import Image from '../models/Image';
+import Video from '../models/Video';
 
 const router = koaRouter();
 const pageCount = 15;
@@ -141,6 +142,57 @@ router.post('/articles', async (ctx, next) => {
   }
   
   ctx.status = 200;
+  await next();
+});
+
+router.post('/videos', async (ctx, next) => {
+  const createdAt = Date.now();
+  const newVideo = ctx.request.body;
+  try {
+    await Video.create({ ...newVideo, createdAt });
+  } catch(e) {
+    ctx.body = e;
+    ctx.status = 500;
+  }
+
+  ctx.status = 200;
+  await next();
+});
+
+router.del('/videos/:id', async (ctx, next) => {
+  const { id } = ctx.params;
+  await Video.update({
+    removed: true,
+  }, {
+    where: { id },
+  });
+
+  ctx.status = 200;
+  await next();  
+});
+
+router.get('/videos/:id', async (ctx, next) => {
+  const { id } = ctx.params;
+  const video = await Video.findById(id);  
+
+  ctx.body = video;
+  await next();
+})
+
+router.get('/videos', async (ctx, next) => {
+  const { page } = ctx.request.query;
+
+  const offset = (page || 0) * pageCount;
+  const videos = await Video.findAll({
+    where: { removed: false || null },
+    order: [
+      ['createdAt', 'DESC']
+    ],
+    offset,
+    limit: pageCount,
+  });
+
+  ctx.body = videos;
   await next();
 });
 
