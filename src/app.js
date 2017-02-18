@@ -5,7 +5,7 @@ import koaBody from 'koa-body';
 
 import sequelize from './helpers/sequelize';
 
-import router from './routes/routes';
+import router from './routes';
 
 const app = new Koa();
 
