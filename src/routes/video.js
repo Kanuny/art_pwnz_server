@@ -1,5 +1,6 @@
 // @flow
 import Video from '../models/Video';
+import Localization from '../models/Localization';
 import config from '../config';
 
 const { pageSize } = config;
@@ -9,7 +10,11 @@ export default (router: any) => {
     const createdAt = Date.now();
     const newVideo = ctx.request.body;
     try {
-      await Video.create({ ...newVideo, createdAt });
+      const nextVideo = await Video.create({ url: newVideo.url, createdAt });
+
+      nextVideo.createName(newVideo.name);
+      nextVideo.createDescription(newVideo.description);
+
     } catch(e) {
       ctx.body = e;
       ctx.status = 500;
@@ -33,7 +38,16 @@ export default (router: any) => {
 
   router.get('/videos/:id', async (ctx, next) => {
     const { id } = ctx.params;
-    const video = await Video.findById(id);  
+    const video = await Video.findById(id, {
+      include: [{
+        model: Localization,
+        as: 'name',
+      }, {
+        model: Localization,
+        as: 'description',
+      }],
+      group: ['id'],
+    });  
 
     ctx.body = video;
 
@@ -42,12 +56,26 @@ export default (router: any) => {
 
   router.put('/videos/:id', async (ctx, next) => {
     const { id } = ctx.params;
-    const nextVideo = ctx.request.body;
+    const { name, description, ...nextVideo } = ctx.request.body;
 
     await Video.update(nextVideo, {
       where: { id },
     });  
-    const video = await Video.findById(id);  
+    const video = await Video.findById(id);
+    
+    const videoName = await video.getName();
+
+    videoName.ru = name.ru;
+    videoName.en = name.en;
+    
+    await videoName.save();
+
+    const videoDescription = await video.getDescription();
+    videoDescription.ru = description.ru;
+    videoDescription.en = description.en;
+
+    await videoDescription.save();
+  
     ctx.body = video;
     await next();
   });
@@ -63,7 +91,16 @@ export default (router: any) => {
       ],
       offset,
       limit: pageSize,
+      include: [{
+        model: Localization,
+        as: 'name',
+      }, {
+        model: Localization,
+        as: 'description',
+      }],
+      group: ['id'],
     });
+
     const videosCount = await Video.count({ where: { removed: false || null }});
     ctx.body = {
       videos,
