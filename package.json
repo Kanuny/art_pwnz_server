@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Kanuny/art_pwnz_server#readme",
   "dependencies": {
+    "babel-register": "^6.23.0",
     "file-type": "^3.9.0",
     "jimp": "^0.2.27",
     "kcors": "^2.2.0",
