@@ -12,8 +12,8 @@ export default (router: any) => {
     try {
       const nextVideo = await Video.create({ url: newVideo.url, createdAt });
 
-      nextVideo.createName(newVideo.name);
-      nextVideo.createDescription(newVideo.description);
+      await nextVideo.createName(newVideo.name);
+      await nextVideo.createDescription(newVideo.description);
 
     } catch(e) {
       ctx.body = e;
@@ -38,15 +38,15 @@ export default (router: any) => {
 
   router.get('/videos/:id', async (ctx, next) => {
     const { id } = ctx.params;
+
     const video = await Video.findById(id, {
       include: [{
         model: Localization,
-        as: 'name',
+        as: 'name'
       }, {
         model: Localization,
         as: 'description',
       }],
-      group: ['id'],
     });  
 
     ctx.body = video;
@@ -60,7 +60,7 @@ export default (router: any) => {
 
     await Video.update(nextVideo, {
       where: { id },
-    });  
+    });
     const video = await Video.findById(id);
     
     const videoName = await video.getName();
@@ -98,7 +98,6 @@ export default (router: any) => {
         model: Localization,
         as: 'description',
       }],
-      group: ['id'],
     });
 
     const videosCount = await Video.count({ where: { removed: false || null }});

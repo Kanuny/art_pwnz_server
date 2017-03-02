@@ -13,10 +13,9 @@ const Video = sequelize.define('video', {
   timestamps: false
 });
 
-Localization.belongsTo(Video);
+Localization.hasMany(Video);
 
-
-Video.hasOne(Localization, { as: 'name' });
-Video.hasOne(Localization, { as: 'description' });
+Video.belongsTo(Localization, { as: 'name' });
+Video.belongsTo(Localization, { as: 'description' });
 
 export default Video;
