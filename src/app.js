@@ -20,4 +20,5 @@ app
   .use(router.routes())
   .use(router.allowedMethods());
 
-app.listen(3000);
+console.log('app running');
+app.listen(80);
