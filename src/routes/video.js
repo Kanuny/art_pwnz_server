@@ -11,13 +11,19 @@ export default (router: any) => {
     const newVideo = ctx.request.body;
     try {
       const nextVideo = await Video.create({ url: newVideo.url, createdAt });
+      if (newVideo.name) {
+        await nextVideo.createName(newVideo.name);  
+      }
+      if (newVideo.description) {
+        await nextVideo.createDescription(newVideo.description);
+      }
 
-      await nextVideo.createName(newVideo.name);
-      await nextVideo.createDescription(newVideo.description);
 
     } catch(e) {
       ctx.body = e;
       ctx.status = 500;
+      await next();
+      return;
     }
 
     ctx.status = 200;

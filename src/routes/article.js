@@ -159,7 +159,6 @@ export default (router: any) => {
       order: [
         ['createdAt', 'DESC']
       ],
-      group: ['id'],
       offset,
       limit: pageSize,
     });
@@ -193,59 +192,87 @@ export default (router: any) => {
     } = ctx.request.body;
     try {
       const nextArticle = await Article.create({ ...article, createdAt });
-      const previewPreview = await getPreview(preview);
-      const mainPreview = await getPreview(main);
-      const fragment1Preview = await getPreview(fragment1);
-      const fragment2Preview = await getPreview(fragment2);
-      const fragment3Preview = await getPreview(fragment3);
+      if (preview) {
+        const previewPreview = await getPreview(preview);
 
-      const mainImg = await Image.create({
-        createdAt,
-        fullScreen: preview,
-        name: 'preview',
-        preview: previewPreview,
-      });
-      const previewImg = await Image.create({
-        createdAt,
-        fullScreen: main,
-        name: 'main',
-        preview: mainPreview,
-      });
-      const fr1Img = await Image.create({
-        createdAt,
-        fullScreen: fragment1,
-        name: 'fragment1',
-        preview: fragment1Preview,
-      });
-      const fr2Img = await Image.create({
-        createdAt,
-        fullScreen: fragment2,
-        preview: fragment2Preview,
-        name: 'fragment2',
-      });
-      const fr3Img = await Image.create({
-        createdAt,
-        fullScreen: fragment3,
-        preview: fragment3Preview,
-        name: 'fragment3',
-      });
+        const previewImg = await Image.create({
+          createdAt,
+          fullScreen: preview,
+          name: 'preview',
+          preview: previewPreview,
+        });
 
-      await nextArticle.addImage(mainImg);
-      await nextArticle.addImage(previewImg);
-      await nextArticle.addImage(fr1Img);
-      await nextArticle.addImage(fr2Img);
-      await nextArticle.addImage(fr3Img);
+        await nextArticle.addImage(previewImg);
+      }
 
-      await nextArticle.createName(name);
-      await nextArticle.createDescription(description);
-      await nextArticle.createPostName(postName);
-      await nextArticle.createPostDescription(postDescription);
-      await nextArticle.addGenre(genre);
+      if (main) {
+        const mainPreview = await getPreview(main);
+        const mainImg = await Image.create({
+          createdAt,
+          fullScreen: main,
+          name: 'main',
+          preview: mainPreview,
+        });
+
+        await nextArticle.addImage(mainImg);
+      }
+      if (fragment1) {
+        const fragment1Preview = await getPreview(fragment1);
+        const fr1Img = await Image.create({
+          createdAt,
+          fullScreen: fragment1,
+          name: 'fragment1',
+          preview: fragment1Preview,
+        });
+
+        await nextArticle.addImage(fr1Img);
+      }
+      if (fragment2) {
+        const fragment2Preview = await getPreview(fragment2);
+
+        const fr2Img = await Image.create({
+          createdAt,
+          fullScreen: fragment2,
+          preview: fragment2Preview,
+          name: 'fragment2',
+        });
+
+        await nextArticle.addImage(fr1Img);
+      }
+      if (fragment3) {
+        const fragment3Preview = await getPreview(fragment3);
+        const fr3Img = await Image.create({
+          createdAt,
+          fullScreen: fragment3,
+          preview: fragment3Preview,
+          name: 'fragment3',
+        });
+
+        await nextArticle.addImage(fr3Img);
+      }
+      if (name) {
+        await nextArticle.createName(name);  
+      }
+      if (description) {
+        await nextArticle.createDescription(description);  
+      }
+      if (postName) {
+        await nextArticle.createPostName(postName);  
+      }
+      if (postDescription) {
+        await nextArticle.createPostDescription(postDescription);  
+      }
+      if (genre) {
+        await nextArticle.createGenre(genre);
+      }
     } catch(e) {
-      console.log('err');
+      console.log('err', e);
 
       ctx.body = e;
       ctx.status = 500;
+
+      await next();
+      return;
     }
     
     ctx.status = 200;
