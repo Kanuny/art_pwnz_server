@@ -25,5 +25,6 @@ Article.belongsTo(Localization, { as: 'description' });
 Article.belongsTo(Localization, { as: 'postName' });
 Article.belongsTo(Localization, { as: 'postDescription' });
 Article.belongsTo(Localization, { as: 'postDescription' });
+Article.belongsTo(Localization, { as: 'genre' });
 
 export default Article;

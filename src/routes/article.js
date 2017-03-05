@@ -111,6 +111,10 @@ export default (router: any) => {
           as: 'postDescription',
         },
         {
+          model: Localization,
+          as: 'genre',
+        },
+        {
           model: Image,
           attributes: ['name', 'id'],
         },
@@ -141,6 +145,10 @@ export default (router: any) => {
         }, {
           model: Localization,
           as: 'postDescription',
+        },
+        {
+          model: Localization,
+          as: 'genre',
         },
         {
           model: Image,

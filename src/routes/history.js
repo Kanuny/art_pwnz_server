@@ -11,6 +11,13 @@ export default (router: any) => {
       order: [
         ['createdAt', 'DESC']
       ],
+      include: [{
+        model: Localization,
+        as: 'name',
+      }, {
+        model: Localization,
+        as: 'description',
+      }],
       offset: 0,
       limit: 10,
     });
@@ -18,6 +25,20 @@ export default (router: any) => {
     const articles = await Article.findAll({
       where: { removed: false || null },
       include: [
+        {
+          model: Localization,
+          as: 'name',
+        }, {
+          model: Localization,
+          as: 'description',
+        },
+        {
+          model: Localization,
+          as: 'postName',
+        }, {
+          model: Localization,
+          as: 'postDescription',
+        },
         {
           model: Image,
           attributes: ['preview', 'name'],
