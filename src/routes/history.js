@@ -9,7 +9,7 @@ export default (router: any) => {
     const videos = await Video.findAll({
       where: { removed: false || null },
       order: [
-        ['createdAt', 'DESC']
+        ['createdAt', 'ASC']
       ],
       include: [{
         model: Localization,
