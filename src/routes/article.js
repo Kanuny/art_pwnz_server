@@ -32,7 +32,7 @@ export default (router: any) => {
   });
   router.put('/articles/:id', async (ctx, next) => {
     const { id } = ctx.params;
-    const { name, description, postName, postDescription, preview, main, fragment1, fragment2, fragment3, genre, ...nextArticle } = ctx.request.body;
+    const { name, description, postName, postDescription, preview, main, fragment1, fragment2, fragment3, ...nextArticle } = ctx.request.body;
     const imgMap = await addPreviewImages([
       { name: 'preview', fullScreen: preview },
       { name: 'main', fullScreen: main },
@@ -82,13 +82,6 @@ export default (router: any) => {
       await articlePostDescription.save();
     }
 
-    if (genre) {
-      const articlePostDescription = await article.getGenre();
-      articlePostDescription.ru = postDescription.ru;
-      articlePostDescription.en = postDescription.en;
-
-      await articlePostDescription.save();
-    }
     ctx.body = article;
     await next();
   });
@@ -109,10 +102,6 @@ export default (router: any) => {
         }, {
           model: Localization,
           as: 'postDescription',
-        },
-        {
-          model: Localization,
-          as: 'genre',
         },
         {
           model: Image,
@@ -147,10 +136,6 @@ export default (router: any) => {
           as: 'postDescription',
         },
         {
-          model: Localization,
-          as: 'genre',
-        },
-        {
           model: Image,
           attributes: ['preview', 'name'],
           where: { name: 'preview'},
@@ -177,6 +162,7 @@ export default (router: any) => {
 
   router.post('/articles', async (ctx, next) => {
     const createdAt = Date.now();
+    const defaultLocale = { ru: '', en: '' };
     const {
       preview,
       main,
@@ -186,7 +172,6 @@ export default (router: any) => {
       name,
       description,
       postName,
-      genre,
       postDescription,
       ...article,
     } = ctx.request.body;
@@ -250,21 +235,10 @@ export default (router: any) => {
 
         await nextArticle.addImage(fr3Img);
       }
-      if (name) {
-        await nextArticle.createName(name);  
-      }
-      if (description) {
-        await nextArticle.createDescription(description);  
-      }
-      if (postName) {
-        await nextArticle.createPostName(postName);  
-      }
-      if (postDescription) {
-        await nextArticle.createPostDescription(postDescription);  
-      }
-      if (genre) {
-        await nextArticle.createGenre(genre);
-      }
+      await nextArticle.createName(name || defaultLocale);
+      await nextArticle.createDescription(description || defaultLocale);
+      await nextArticle.createPostName(postName || defaultLocale);
+      await nextArticle.createPostDescription(postDescription || defaultLocale);
     } catch(e) {
       console.log('err', e);
 
@@ -274,7 +248,7 @@ export default (router: any) => {
       await next();
       return;
     }
-    
+
     ctx.status = 200;
     await next();
   });
