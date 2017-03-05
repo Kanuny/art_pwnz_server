@@ -1,8 +1,8 @@
-
 // @flow
 import Article from '../models/Article';
 import Image from '../models/Image';
 import Video from '../models/Video';
+import Localization from '../models/Localization';
 
 export default (router: any) => {
   router.get('/history', async (ctx, next) => {
