@@ -32,7 +32,7 @@ function updateImages(arr, id) {
   return Promise.all(promises);
 }
 export default (router: any) => {
-  router.get('/articles/filters', async (ctx, next) => {
+  router.get('/articles/filters', async (ctx) => {
     try {
       const counts = await getFiltersCount();
       const filtersMap = filters.map((filter, index) => (counts[index]
@@ -47,8 +47,6 @@ export default (router: any) => {
       ctx.status = 400;
       ctx.body = e;
     }
-
-    await next()
   });
 
   router.del('/articles/:id', async (ctx, next) => {
