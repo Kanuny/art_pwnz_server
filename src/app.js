@@ -14,7 +14,7 @@ app.use(koaBody({
   jsonLimit: 52428800,
 }));
 
-sequelize.sync({ force: true });
+sequelize.sync();
 
 app
   .use(router.routes())

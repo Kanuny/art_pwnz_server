@@ -6,7 +6,19 @@ import { getPreview } from '../helpers/images';
 import Localization from '../models/Localization';
 
 const { pageSize } = config;
+const filters = [
+  { name: 'forSale', query: { forSale: true } },
+  { name: 'landscape', query: { genre: 'landscape' } },
+  { name: 'portrait', query: { genre: 'portrait' } },
+  { name: 'stillLife', query: { genre: 'stillLife' } },
+  { name: 'figurative', query: { genre: 'figurative' } },
+  { name: 'other', query: { genre: false || null } },
+];
+function getFiltersCount() {
+  const promises = filters.map(filter => Article.count({ where: filter.query }));
 
+  return Promise.all(promises);
+}
 function addPreviewImages(arr) {
   const promises = arr.map(item => getPreview(item.fullScreen).then(preview => ({ ...item, preview })) );
   return Promise.all(promises);
@@ -19,6 +31,25 @@ function updateImages(arr, id) {
   return Promise.all(promises);
 }
 export default (router: any) => {
+  router.get('/articles/filters', async (ctx, next) => {
+    try {
+      const counts = await getFiltersCount();
+      const filtersMap = filters.map((filter, index) => (counts[index]
+        ? { name: filter.name, count: counts[index] }
+        : null
+      ));
+      ctx.status = 200;
+      ctx.body = filtersMap;
+
+      return next();
+    } catch(e) {
+      ctx.status = 400;
+      ctx.body = e;
+
+      return next();
+    }
+  });
+
   router.del('/articles/:id', async (ctx, next) => {
     const { id } = ctx.params;
     await Article.update({
@@ -28,7 +59,7 @@ export default (router: any) => {
     });
 
     ctx.status = 200;
-    await next();  
+    return next();  
   });
   router.put('/articles/:id', async (ctx, next) => {
     const { id } = ctx.params;
@@ -115,11 +146,14 @@ export default (router: any) => {
   })
 
   router.get('/articles', async (ctx, next) => {
-    const { page } = ctx.request.query;
-
+    const { page, filter } = ctx.request.query;
+    const filterQuery = filter ? filters[filter].query : {};
     const offset = (page || 0) * pageSize;
     const articles = await Article.findAll({
-      where: { removed: false || null },
+      where: {
+        removed: false || null,
+        ...filterQuery,
+      },
       include: [
         {
           model: Localization,
@@ -137,7 +171,7 @@ export default (router: any) => {
         },
         {
           model: Image,
-          attributes: ['preview', 'name'],
+          attributes: ['preview', 'name', 'id'],
           where: { name: 'preview'},
         },
       ],
@@ -222,7 +256,7 @@ export default (router: any) => {
           name: 'fragment2',
         });
 
-        await nextArticle.addImage(fr1Img);
+        await nextArticle.addImage(fr2Img);
       }
       if (fragment3) {
         const fragment3Preview = await getPreview(fragment3);
