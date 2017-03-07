@@ -7,6 +7,7 @@ import Localization from '../models/Localization';
 
 const { pageSize } = config;
 const filters = [
+  { name: 'all', query: {}},
   { name: 'forSale', query: { forSale: true } },
   { name: 'landscape', query: { genre: 'landscape' } },
   { name: 'portrait', query: { genre: 'portrait' } },
@@ -37,17 +38,17 @@ export default (router: any) => {
       const filtersMap = filters.map((filter, index) => (counts[index]
         ? { name: filter.name, count: counts[index] }
         : null
-      ));
-      ctx.status = 200;
-      ctx.body = filtersMap;
+      )).filter(item => !!item);
 
-      return next();
+      ctx.body = filtersMap;
+      ctx.status = 200;
+ 
     } catch(e) {
       ctx.status = 400;
       ctx.body = e;
-
-      return next();
     }
+
+    await next()
   });
 
   router.del('/articles/:id', async (ctx, next) => {
