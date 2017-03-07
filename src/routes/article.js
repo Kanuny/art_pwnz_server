@@ -146,12 +146,15 @@ export default (router: any) => {
 
   router.get('/articles', async (ctx, next) => {
     const { page, filter } = ctx.request.query;
-    const filterQuery = filter ? filters[filter].query : {};
+    const selectedFilter = filter
+      ? filters.find(f => f.name === filter) || {}
+      : {}; 
+    // const filterQuery = filter ? filters[filter].query : {};
     const offset = (page || 0) * pageSize;
     const articles = await Article.findAll({
       where: {
         removed: false || null,
-        ...filterQuery,
+        ...selectedFilter.query || {},
       },
       include: [
         {
