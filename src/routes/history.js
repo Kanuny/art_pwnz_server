@@ -3,9 +3,10 @@ import Article from '../models/Article';
 import Image from '../models/Image';
 import Video from '../models/Video';
 import Localization from '../models/Localization';
+import auth from '../middlewares/auth';
 
 export default (router: any) => {
-  router.get('/history', async (ctx, next) => {
+  router.get('/history', auth(['admin']), async (ctx, next) => {
     const videos = await Video.findAll({
       where: { removed: false || null },
       order: [
@@ -44,7 +45,7 @@ export default (router: any) => {
           attributes: ['preview', 'name'],
           where: { name: 'preview'},
         },
-      ],    
+      ],
       order: [
         ['createdAt', 'DESC']
       ],

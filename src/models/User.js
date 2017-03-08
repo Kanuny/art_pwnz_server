@@ -1,10 +1,12 @@
 // @flow
-import { STRING, DATE } from 'sequelize';
+import { STRING } from 'sequelize';
 
 import sequelize from '../helpers/sequelize';
 
 const User = sequelize.define('user', {
-  updatedAt: DATE,
+  username: STRING,
+  password: STRING,
+  role: STRING,
   token: STRING,
 }, {
   timestamps: false

@@ -4,6 +4,7 @@ import Image from '../models/Image';
 import config from '../config';
 import { getPreview } from '../helpers/images';
 import Localization from '../models/Localization';
+import auth from '../middlewares/auth';
 
 const { pageSize } = config;
 const filters = [
@@ -32,7 +33,7 @@ function updateImages(arr, id) {
   return Promise.all(promises);
 }
 export default (router: any) => {
-  router.get('/articles/filters', async (ctx) => {
+  router.get('/articles/filters', auth(['admin']), async (ctx) => {
     try {
       const counts = await getFiltersCount();
       const filtersMap = filters.map((filter, index) => (counts[index]
@@ -42,14 +43,14 @@ export default (router: any) => {
 
       ctx.body = filtersMap;
       ctx.status = 200;
- 
+
     } catch(e) {
       ctx.status = 400;
       ctx.body = e;
     }
   });
 
-  router.del('/articles/:id', async (ctx, next) => {
+  router.del('/articles/:id', auth(['admin']), async (ctx, next) => {
     const { id } = ctx.params;
     await Article.update({
       removed: true,
@@ -58,9 +59,9 @@ export default (router: any) => {
     });
 
     ctx.status = 200;
-    return next();  
+    return next();
   });
-  router.put('/articles/:id', async (ctx, next) => {
+  router.put('/articles/:id', auth(['admin']), async (ctx, next) => {
     const { id } = ctx.params;
     const { name, description, postName, postDescription, preview, main, fragment1, fragment2, fragment3, ...nextArticle } = ctx.request.body;
     const imgMap = await addPreviewImages([
@@ -100,7 +101,7 @@ export default (router: any) => {
 
       articlePostName.ru = postName.ru;
       articlePostName.en = postName.en;
-      
+
       await articlePostName.save();
     }
 
@@ -115,7 +116,7 @@ export default (router: any) => {
     ctx.body = article;
     await next();
   });
-  router.get('/articles/:id', async (ctx, next) => {
+  router.get('/articles/:id', auth(['admin']), async (ctx, next) => {
     const { id } = ctx.params;
     const article = await Article.findById(id, {
       include: [
@@ -138,18 +139,18 @@ export default (router: any) => {
           attributes: ['name', 'id'],
         },
       ],
-    });  
+    });
 
     ctx.body = article;
     await next();
   })
 
-  router.get('/articles', async (ctx, next) => {
+  router.get('/articles', auth(['admin']), async (ctx, next) => {
     const { page, filter } = ctx.request.query;
     const selectedFilter = filter
       ? filters.find(f => f.name === filter) || {}
-      : {}; 
-    // const filterQuery = filter ? filters[filter].query : {};
+      : {};
+
     const offset = (page || 0) * pageSize;
     const articles = await Article.findAll({
       where: {
@@ -185,7 +186,7 @@ export default (router: any) => {
     });
 
     const articlesCount = await Article.count({ where: { removed: false || null } });
-  
+
     ctx.body = {
       articles,
       pageCount: pageSize,
@@ -196,7 +197,7 @@ export default (router: any) => {
   });
 
 
-  router.post('/articles', async (ctx, next) => {
+  router.post('/articles', auth(['admin']), async (ctx, next) => {
     const createdAt = Date.now();
     const defaultLocale = { ru: '', en: '' };
     const {

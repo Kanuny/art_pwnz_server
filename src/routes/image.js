@@ -1,9 +1,10 @@
 // @flow
 import Image from '../models/Image';
 import { getPreview } from '../helpers/images';
+import auth from '../middlewares/auth';
 
 export default (router: any) => {
-  router.get('/images/:id', async (ctx, next) => {
+  router.get('/images/:id', auth(['admin']), async (ctx, next) => {
     const { id } = ctx.params;
     const image = await Image.findById(id);
 
@@ -23,7 +24,7 @@ export default (router: any) => {
     }, {
       where: { id },
     });
-        
+
     ctx.status = 200;
     await next();
   });
