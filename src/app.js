@@ -1,7 +1,7 @@
 // @flow
 import Koa from 'koa';
 import cors from 'kcors';
-import koaBody from 'koa-body';
+import bodyParser from 'koa-body';
 import passport from 'koa-passport';
 import convert from 'koa-convert';
 import session from 'koa-generic-session';
@@ -19,9 +19,7 @@ async function launch() {
 
   app
     .use(cors())
-    .use(koaBody({
-      jsonLimit: 52428800,
-    }))
+    .use(bodyParser())
     .use(convert(session()));
   // eslint-disable-next-line
   require('./helpers/passport');

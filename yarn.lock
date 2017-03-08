@@ -541,7 +541,7 @@ cli-width@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/cli-width/-/cli-width-2.1.0.tgz#b234ca209b29ef66fc518d9b98d5847b00edf00a"
 
-co-body@*:
+co-body@*, co-body@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/co-body/-/co-body-5.0.0.tgz#113102dbff558fbd2843d963cc432790ec343680"
   dependencies:
@@ -609,7 +609,7 @@ cookies@~0.6.1:
     depd "~1.1.0"
     keygrip "~1.0.1"
 
-copy-to@~2.0.1:
+copy-to@^2.0.1, copy-to@~2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/copy-to/-/copy-to-2.0.1.tgz#2680fbb8068a48d08656b6098092bdafc906f4a5"
 
@@ -1658,6 +1658,13 @@ koa-body@^2.0.0:
     co-body "*"
     formidable "1.0.17"
     koa "^2.0.0"
+
+koa-bodyparser@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/koa-bodyparser/-/koa-bodyparser-4.1.0.tgz#f1112202bd059f74e03ef2d1f344c4dd5038ab95"
+  dependencies:
+    co-body "^5.0.0"
+    copy-to "^2.0.1"
 
 koa-compose@^3.0.0:
   version "3.2.1"
