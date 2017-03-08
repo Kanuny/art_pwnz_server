@@ -9,7 +9,7 @@ async function login(ctx) {
     await User.update({
       token,
     }, { where: { username: ctx.state.user.username } });
-
+    console.log('logged in', ctx.state.user);
     const nextUser = await User.findOne({
       where: { username: ctx.state.user.username },
     });
