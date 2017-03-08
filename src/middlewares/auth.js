@@ -2,7 +2,7 @@ import passport from 'koa-passport';
 
 export default function (roles) {
   return async (ctx, next) => {
-    console.log('!!!', ctx.status);
+    console.log('!!!', ctx.status, ctx.isAuthenticated());
     if (!ctx.isAuthenticated()) {
       ctx.status = 401;
       return;
