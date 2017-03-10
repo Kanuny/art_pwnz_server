@@ -5,7 +5,7 @@ import config from '../config';
 import auth from '../middlewares/auth';
 
 const { pageSize } = config;
-
+const defaultLocale = { ru: '', en: '' };
 export default (router: any) => {
   router.post('/videos', auth(['admin']), async (ctx, next) => {
     const createdAt = Date.now();
@@ -13,10 +13,10 @@ export default (router: any) => {
     try {
       const nextVideo = await Video.create({ url: newVideo.url, createdAt });
       if (newVideo.name) {
-        await nextVideo.createName(newVideo.name);
+        await nextVideo.createName(newVideo.name || defaultLocale);
       }
       if (newVideo.description) {
-        await nextVideo.createDescription(newVideo.description);
+        await nextVideo.createDescription(newVideo.description || defaultLocale);
       }
 
 
@@ -70,18 +70,20 @@ export default (router: any) => {
     });
     const video = await Video.findById(id);
 
-    const videoName = await video.getName();
+    if (name) {
+      const videoName = await video.getName();
+      videoName.ru = name.ru;
+      videoName.en = name.en;
 
-    videoName.ru = name.ru;
-    videoName.en = name.en;
+      await videoName.save();
+    }
+    if (video) {
+      const videoDescription = await video.getDescription();
+      videoDescription.ru = description.ru;
+      videoDescription.en = description.en;
 
-    await videoName.save();
-
-    const videoDescription = await video.getDescription();
-    videoDescription.ru = description.ru;
-    videoDescription.en = description.en;
-
-    await videoDescription.save();
+      await videoDescription.save();
+    }
 
     ctx.body = video;
     await next();
