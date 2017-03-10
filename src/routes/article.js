@@ -33,7 +33,7 @@ function updateImages(arr, id) {
   return Promise.all(promises);
 }
 export default (router: any) => {
-  router.get('/articles/filters', auth(['admin']), async (ctx) => {
+  router.get('/articles/filters', async (ctx) => {
     try {
       const counts = await getFiltersCount();
       const filtersMap = filters.map((filter, index) => (counts[index]
@@ -116,7 +116,7 @@ export default (router: any) => {
     ctx.body = article;
     await next();
   });
-  router.get('/articles/:id', auth(['admin']), async (ctx, next) => {
+  router.get('/articles/:id', async (ctx, next) => {
     const { id } = ctx.params;
     const article = await Article.findById(id, {
       include: [
@@ -145,7 +145,7 @@ export default (router: any) => {
     await next();
   })
 
-  router.get('/articles', auth(['admin']), async (ctx, next) => {
+  router.get('/articles', async (ctx, next) => {
     const { page, filter } = ctx.request.query;
     const selectedFilter = filter
       ? filters.find(f => f.name === filter) || {}

@@ -43,7 +43,7 @@ export default (router: any) => {
     await next();
   });
 
-  router.get('/videos/:id', auth(['admin']), async (ctx, next) => {
+  router.get('/videos/:id', async (ctx, next) => {
     const { id } = ctx.params;
 
     const video = await Video.findById(id, {
@@ -87,7 +87,7 @@ export default (router: any) => {
     await next();
   });
 
-  router.get('/videos', auth(['admin']), async (ctx, next) => {
+  router.get('/videos', async (ctx, next) => {
     const { page } = ctx.request.query;
 
     const offset = (page || 0) * pageSize;
