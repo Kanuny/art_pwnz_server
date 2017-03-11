@@ -47,6 +47,8 @@
     "koa-router": "^7.0.1",
     "lodash": "^4.17.4",
     "mysql": "^2.13.0",
+    "nodemailer": "^3.1.5",
+    "nodemailer-sendgrid-transport": "^0.2.0",
     "passport": "^0.3.2",
     "passport-jwt": "^2.2.1",
     "passport-local": "^1.0.0",
