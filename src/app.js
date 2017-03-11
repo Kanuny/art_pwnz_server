@@ -19,7 +19,11 @@ async function launch() {
 
   app
     .use(cors())
-    .use(bodyParser())
+    .use(bodyParser({
+      jsonLimit: '100mb',
+      formLimit: '100mb',
+      textLimit: '100mb',
+    }))
     .use(convert(session()));
   // eslint-disable-next-line
   require('./helpers/passport');
