@@ -24,8 +24,8 @@ export async function saveImg(base64Url, name) {
   const jimpImg = await jimp.read(new Buffer(base64Data, 'base64'));
   return new Promise((res) => {
     console.log('!!!', __dirname);
-    jimpImg.write(`${__dirname}/public/img-${name}.png`, () => {
-      res(`${__dirname}/public/img-${name}.png`);
+    jimpImg.write(`../../public/img-${name}.png`, () => {
+      res(`../../public/img-${name}.png`);
     });
   });
 }
