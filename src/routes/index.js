@@ -4,6 +4,7 @@ import compose from 'lodash/fp/compose';
 
 import send from '../helpers/mailer';
 import Article from '../models/Article';
+import Image from '../models/Image';
 
 import article from './article';
 import history from './history';
