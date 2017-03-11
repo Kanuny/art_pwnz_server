@@ -17,7 +17,10 @@ const filters = [
   { name: 'other', query: { genre: false || null } },
 ];
 function getFiltersCount() {
-  const promises = filters.map(filter => Article.count({ where: filter.query }));
+  const promises = filters.map(filter => Article.count({ where: {
+    ...filter.query,
+    removed: false || null,
+  } }));
 
   return Promise.all(promises);
 }
