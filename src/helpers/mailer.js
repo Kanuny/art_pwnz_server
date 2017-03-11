@@ -9,7 +9,7 @@ const mailer = nodemailer.createTransport(sgTransport({
   },
 }));
 
-const SUBJECT = (name, email) => `Запрос с сайта klapouh.com - ${name} ${email}`;
+const subject = (name, email) => `Запрос с сайта klapouh.com - ${name} ${email}`;
 
 function tpl(name, email, message) {
   return (
@@ -27,7 +27,7 @@ export default function sendEmail(from, name, message) {
   const email = {
     to: config.MAIL_ADDRESS,
     from,
-    subject: SUBJECT(name, from),
+    subject: subject(name, from),
     html: tpl(name, from, message),
   };
 
