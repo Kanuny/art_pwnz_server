@@ -56,6 +56,7 @@ async function getSharing(ctx) {
         <meta property="og:type" content="article" />
         <meta property="og:title" content="${article.name[lang]}" />
         <meta property="og:description" content="${desc[lang]}" />
+        <meta property="og:url" content="https://artpwnz.herokuapp.com/getSharingHtml/${lang}/${id}" />
         <meta property="og:image" content="https://artpwnz.herokuapp.com${url}" />
         <meta property="fb:app_id" content="168322313682294"/>
       </head>
