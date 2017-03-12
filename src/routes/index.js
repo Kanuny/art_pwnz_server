@@ -28,7 +28,7 @@ function sendEmail(ctx) {
   }
 }
 async function getSharing(ctx) {
-  const { id } = ctx.params;
+  const { id, lang } = ctx.params;
   const article = await Article.findById(id, {
     include: [
       {
@@ -45,14 +45,18 @@ async function getSharing(ctx) {
     article.images[0].preview,
     article.name.en,
   );
+  const desc = {
+    ru: 'Работа Юрия Клапоуха',
+    en: 'Artwork by Yury Klapouh',
+  };
   ctx.body = `
     <html>
       <head>
         <title>Art-Pwnz</title>
         <meta property="og:url" content="https://artpwnz.herokuapp.com/getSharingHtml/8" />
         <meta property="og:type" content="article" />
-        <meta property="og:title" content="Art-Pwnz" />
-        <meta property="og:description" content="${article.name.ru}" />
+        <meta property="og:title" content="${article.name[lang]}" />
+        <meta property="og:description" content="${desc[lang]}" />
         <meta property="og:image" content="https://artpwnz.herokuapp.com${url}" />
       </head>
     </html>
@@ -61,7 +65,7 @@ async function getSharing(ctx) {
 }
 function defaultRoutes(router) {
   router.post('/sendBuyingRequest', sendEmail);
-  router.get('/getSharingHtml/:id', getSharing);
+  router.get('/getSharingHtml/:lang/:id', getSharing);
 
   return router;
 }
