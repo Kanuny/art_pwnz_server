@@ -43,7 +43,7 @@ async function getSharing(ctx) {
   });
   const url = await saveImg(
     article.images[0].preview,
-    article.name.en,
+    article.id,
   );
   const desc = {
     ru: 'Работа Юрия Клапоуха',
