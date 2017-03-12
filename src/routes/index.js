@@ -43,16 +43,16 @@ async function getSharing(ctx) {
   });
   const url = await saveImg(
     article.images[0].preview,
-    article.name
+    article.name.en,
   );
   ctx.body = `
     <html>
       <head>
         <title>Art-Pwnz</title>
-        <meta property="og:url" content="https://artpwnz-client.herokuapp.com/gallery" />
+        <meta property="og:url" content="https://artpwnz.herokuapp.com/getSharingHtml/8" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Art-Pwnz" />
-        <meta property="og:description" content="${article.name}" />
+        <meta property="og:description" content="${article.name.ru}" />
         <meta property="og:image" content="${url}" />
       </head>
     </html>
