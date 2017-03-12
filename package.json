@@ -45,6 +45,7 @@
     "koa-generic-session": "^1.11.5",
     "koa-passport": "^3.0.0",
     "koa-router": "^7.0.1",
+    "koa-static": "^3.0.0",
     "lodash": "^4.17.4",
     "mysql": "^2.13.0",
     "nodemailer": "^3.1.5",

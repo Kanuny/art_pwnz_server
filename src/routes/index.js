@@ -5,6 +5,7 @@ import compose from 'lodash/fp/compose';
 import send from '../helpers/mailer';
 import Article from '../models/Article';
 import Image from '../models/Image';
+import Localization from '../models/Localization';
 
 import article from './article';
 import history from './history';
@@ -34,17 +35,26 @@ async function getSharing(ctx) {
         model: Image,
         attributes: ['name', 'id', 'preview'],
       },
+      {
+        model: Localization,
+        as: 'name',
+      },
     ],
   });
   const url = await saveImg(
     article.images[0].preview,
-    article.images[0].name
+    article.name
   );
   ctx.body = `
     <html>
-      <body>
-        <img src=${url}>
-      </body>
+      <head>
+        <title>Art-Pwnz</title>
+        <meta property="og:url" content="https://artpwnz-client.herokuapp.com/gallery" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Art-Pwnz" />
+        <meta property="og:description" content="${article.name}" />
+        <meta property="og:image" content="${url}" />
+      </head>
     </html>
   `;
   ctx.status = 200;

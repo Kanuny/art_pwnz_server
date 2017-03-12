@@ -5,6 +5,7 @@ import bodyParser from 'koa-body';
 import passport from 'koa-passport';
 import convert from 'koa-convert';
 import session from 'koa-generic-session';
+import serve from 'koa-static';
 
 import sequelize from './helpers/sequelize';
 
@@ -16,8 +17,8 @@ app.keys = ['secret'];
 
 async function launch() {
   await sequelize.sync();
-
   app
+    .use(serve('public'))
     .use(cors())
     .use(bodyParser({
       jsonLimit: '100mb',
