@@ -10,7 +10,9 @@ const Article = sequelize.define('article', {
   hidden: BOOLEAN,
   removed: BOOLEAN,
   createdAt: DATE,
+  size: STRING,
   year: STRING,
+  genre: STRING,
   forSale: BOOLEAN,
 }, {
   timestamps: false
