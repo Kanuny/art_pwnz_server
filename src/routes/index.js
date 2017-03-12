@@ -53,7 +53,7 @@ async function getSharing(ctx) {
         <meta property="og:type" content="website" />
         <meta property="og:title" content="Art-Pwnz" />
         <meta property="og:description" content="${article.name.ru}" />
-        <meta property="og:image" content="${url}" />
+        <meta property="og:image" content="https://artpwnz.herokuapp.com${url}" />
       </head>
     </html>
   `;
