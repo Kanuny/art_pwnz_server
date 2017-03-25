@@ -25,7 +25,8 @@ function getFiltersCount() {
   return Promise.all(promises);
 }
 function addPreviewImages(arr) {
-  const promises = arr.map(item => getPreview(item.fullScreen).then(preview => ({ ...item, preview })) );
+  const promises = arr.map(item => getPreview(item.fullScreen)
+    .then(preview => ({ ...item, preview })) );
   return Promise.all(promises);
 }
 function updateImages(arr, id) {
@@ -217,64 +218,56 @@ export default (router: any) => {
     } = ctx.request.body;
     try {
       const nextArticle = await Article.create({ ...article, createdAt });
-      if (preview) {
-        const previewPreview = await getPreview(preview);
+      const previewPreview = await getPreview(preview);
+      const previewImg = await Image.create({
+        createdAt,
+        fullScreen: preview,
+        name: 'preview',
+        preview: previewPreview,
+      });
 
-        const previewImg = await Image.create({
-          createdAt,
-          fullScreen: preview,
-          name: 'preview',
-          preview: previewPreview,
-        });
+      await nextArticle.addImage(previewImg);
 
-        await nextArticle.addImage(previewImg);
-      }
+      const mainPreview = await getPreview(main);
+      const mainImg = await Image.create({
+        createdAt,
+        fullScreen: main,
+        name: 'main',
+        preview: mainPreview,
+      });
 
-      if (main) {
-        const mainPreview = await getPreview(main);
-        const mainImg = await Image.create({
-          createdAt,
-          fullScreen: main,
-          name: 'main',
-          preview: mainPreview,
-        });
+      await nextArticle.addImage(mainImg);
 
-        await nextArticle.addImage(mainImg);
-      }
-      if (fragment1) {
-        const fragment1Preview = await getPreview(fragment1);
-        const fr1Img = await Image.create({
-          createdAt,
-          fullScreen: fragment1,
-          name: 'fragment1',
-          preview: fragment1Preview,
-        });
+      const fragment1Preview = await getPreview(fragment1);
+      const fr1Img = await Image.create({
+        createdAt,
+        fullScreen: fragment1,
+        name: 'fragment1',
+        preview: fragment1Preview,
+      });
 
-        await nextArticle.addImage(fr1Img);
-      }
-      if (fragment2) {
-        const fragment2Preview = await getPreview(fragment2);
+      await nextArticle.addImage(fr1Img);
 
-        const fr2Img = await Image.create({
-          createdAt,
-          fullScreen: fragment2,
-          preview: fragment2Preview,
-          name: 'fragment2',
-        });
+      const fragment2Preview = await getPreview(fragment2);
+      const fr2Img = await Image.create({
+        createdAt,
+        fullScreen: fragment2,
+        preview: fragment2Preview,
+        name: 'fragment2',
+      });
 
-        await nextArticle.addImage(fr2Img);
-      }
-      if (fragment3) {
-        const fragment3Preview = await getPreview(fragment3);
-        const fr3Img = await Image.create({
-          createdAt,
-          fullScreen: fragment3,
-          preview: fragment3Preview,
-          name: 'fragment3',
-        });
+      await nextArticle.addImage(fr2Img);
 
-        await nextArticle.addImage(fr3Img);
-      }
+      const fragment3Preview = await getPreview(fragment3);
+      const fr3Img = await Image.create({
+        createdAt,
+        fullScreen: fragment3,
+        preview: fragment3Preview,
+        name: 'fragment3',
+      });
+
+      await nextArticle.addImage(fr3Img);
+
       await nextArticle.createName(name || defaultLocale);
       await nextArticle.createDescription(description || defaultLocale);
       await nextArticle.createPostName(postName || defaultLocale);

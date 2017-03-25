@@ -7,6 +7,9 @@ function extract(url) {
 }
 
 export async function getPreview(img) {
+  if (!img) {
+    return Promise.resolve('');
+  }
   const base64Data = extract(img);
 
   const jimpImg = await jimp.read(new Buffer(base64Data, 'base64'));
