@@ -46,7 +46,7 @@ export default (router: any) => {
         },
       ],
       order: [
-        ['createdAt', 'DESC']
+        ['createdAt', 'ASC']
       ],
       offset: 0,
       limit: 10,
