@@ -29,11 +29,11 @@ function addPreviewImages(arr) {
     .then(preview => ({ ...item, preview })) );
   return Promise.all(promises);
 }
-function updateImages(arr, id) {
+function updateImages(arr, id, transaction) {
   const promises = arr.map(({name, fullScreen, preview}) => Image.update({
     fullScreen,
     preview,
-  }, { where: { name, articleId: id } }));
+  }, { where: { name, articleId: id }, transaction }));
   return Promise.all(promises);
 }
 export default (router: any) => {
@@ -65,9 +65,11 @@ export default (router: any) => {
     ctx.status = 200;
     return next();
   });
-  router.put('/articles/:id', auth(['admin']), async (ctx, next) => {
+  router.put('/articles/:id', auth(['admin']), async (ctx) => {
     const { id } = ctx.params;
-    const { name, description, postName, postDescription, preview, main, fragment1, fragment2, fragment3, ...nextArticle } = ctx.request.body;
+    const { name, description, preview, main, fragment1, fragment2, fragment3, ...nextArticle } = ctx.request.body;
+    const transaction = await Article.sequelize.transaction();
+
     const imgMap = await addPreviewImages([
       { name: 'preview', fullScreen: preview },
       { name: 'main', fullScreen: main },
@@ -75,50 +77,37 @@ export default (router: any) => {
       { name: 'fragment2', fullScreen: fragment2 },
       { name: 'fragment3', fullScreen: fragment3 },
     ].filter(item => !!item.fullScreen));
+    try {
+      await Article.update(nextArticle, {
+        where: { id },
+      }, { transaction });
+      await updateImages(imgMap, id, transaction);
 
-    await Article.update(nextArticle, {
-      where: { id },
-    });
-    await updateImages(imgMap, id);
+      const article = await Article.findById(id);
 
-    const article = await Article.findById(id);
+      if (name) {
+        const articleName = await article.getName();
 
-    if (name) {
-      const articleName = await article.getName();
+        articleName.ru = name.ru;
+        articleName.en = name.en;
 
-      articleName.ru = name.ru;
-      articleName.en = name.en;
+        await articleName.save({ transaction });
+      }
 
-      await articleName.save();
+      if (description) {
+        const articleDescription = await article.getDescription();
+        articleDescription.ru = description.ru;
+        articleDescription.en = description.en;
+
+        await articleDescription.save({ transaction });
+      }
+      await transaction.commit();
+      ctx.body = article;
+    } catch(e) {
+      await transaction.rollback();
+      ctx.body = e;
+      ctx.status = 400;
     }
-
-    if (description) {
-      const articleDescription = await article.getDescription();
-      articleDescription.ru = description.ru;
-      articleDescription.en = description.en;
-
-      await articleDescription.save();
-    }
-
-    if (postName) {
-      const articlePostName = await article.getPostName();
-
-      articlePostName.ru = postName.ru;
-      articlePostName.en = postName.en;
-
-      await articlePostName.save();
-    }
-
-    if (postDescription) {
-      const articlePostDescription = await article.getPostDescription();
-      articlePostDescription.ru = postDescription.ru;
-      articlePostDescription.en = postDescription.en;
-
-      await articlePostDescription.save();
-    }
-
-    ctx.body = article;
-    await next();
   });
   router.get('/articles/:id', async (ctx, next) => {
     const { id } = ctx.params;
@@ -130,13 +119,6 @@ export default (router: any) => {
         }, {
           model: Localization,
           as: 'description',
-        },
-        {
-          model: Localization,
-          as: 'postName',
-        }, {
-          model: Localization,
-          as: 'postDescription',
         },
         {
           model: Image,
@@ -170,13 +152,6 @@ export default (router: any) => {
           as: 'description',
         },
         {
-          model: Localization,
-          as: 'postName',
-        }, {
-          model: Localization,
-          as: 'postDescription',
-        },
-        {
           model: Image,
           attributes: ['preview', 'name', 'id'],
           where: { name: 'preview'},
@@ -203,6 +178,8 @@ export default (router: any) => {
 
   router.post('/articles', auth(['admin']), async (ctx, next) => {
     const createdAt = Date.now();
+    const transaction = await Article.sequelize.transaction();
+
     const defaultLocale = { ru: '', en: '' };
     const {
       preview,
@@ -212,21 +189,19 @@ export default (router: any) => {
       fragment3,
       name,
       description,
-      postName,
-      postDescription,
       ...article,
     } = ctx.request.body;
     try {
-      const nextArticle = await Article.create({ ...article, createdAt });
+      const nextArticle = await Article.create({ ...article, createdAt }, { transaction });
       const previewPreview = await getPreview(preview);
       const previewImg = await Image.create({
         createdAt,
         fullScreen: preview,
         name: 'preview',
         preview: previewPreview,
-      });
+      }, { transaction });
 
-      await nextArticle.addImage(previewImg);
+      await nextArticle.addImage(previewImg, { transaction });
 
       const mainPreview = await getPreview(main);
       const mainImg = await Image.create({
@@ -234,9 +209,9 @@ export default (router: any) => {
         fullScreen: main,
         name: 'main',
         preview: mainPreview,
-      });
+      }, { transaction });
 
-      await nextArticle.addImage(mainImg);
+      await nextArticle.addImage(mainImg, { transaction });
 
       const fragment1Preview = await getPreview(fragment1);
       const fr1Img = await Image.create({
@@ -244,9 +219,9 @@ export default (router: any) => {
         fullScreen: fragment1,
         name: 'fragment1',
         preview: fragment1Preview,
-      });
+      }, { transaction });
 
-      await nextArticle.addImage(fr1Img);
+      await nextArticle.addImage(fr1Img, { transaction });
 
       const fragment2Preview = await getPreview(fragment2);
       const fr2Img = await Image.create({
@@ -254,9 +229,9 @@ export default (router: any) => {
         fullScreen: fragment2,
         preview: fragment2Preview,
         name: 'fragment2',
-      });
+      }, { transaction });
 
-      await nextArticle.addImage(fr2Img);
+      await nextArticle.addImage(fr2Img, { transaction });
 
       const fragment3Preview = await getPreview(fragment3);
       const fr3Img = await Image.create({
@@ -264,16 +239,16 @@ export default (router: any) => {
         fullScreen: fragment3,
         preview: fragment3Preview,
         name: 'fragment3',
-      });
+      }, { transaction });
 
-      await nextArticle.addImage(fr3Img);
+      await nextArticle.addImage(fr3Img, { transaction });
 
-      await nextArticle.createName(name || defaultLocale);
-      await nextArticle.createDescription(description || defaultLocale);
-      await nextArticle.createPostName(postName || defaultLocale);
-      await nextArticle.createPostDescription(postDescription || defaultLocale);
+      await nextArticle.createName(name || defaultLocale, { transaction });
+      await nextArticle.createDescription(description || defaultLocale, { transaction });
+
+      await transaction.commit();
     } catch(e) {
-      console.log('err', e);
+      await transaction.rollback();
 
       ctx.body = e;
       ctx.status = 500;

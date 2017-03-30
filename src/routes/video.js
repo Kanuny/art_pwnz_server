@@ -10,17 +10,29 @@ export default (router: any) => {
   router.post('/videos', auth(['admin']), async (ctx, next) => {
     const createdAt = Date.now();
     const newVideo = ctx.request.body;
+    const transaction = await Video.sequelize.transaction();
+
     try {
-      const nextVideo = await Video.create({ url: newVideo.url, createdAt });
+      const nextVideo = await Video.create({
+        url: newVideo.url,
+        createdAt,
+      }, { transaction });
       if (newVideo.name) {
-        await nextVideo.createName(newVideo.name || defaultLocale);
+        await nextVideo.createName(
+          newVideo.name || defaultLocale,
+          { transaction },
+        );
       }
       if (newVideo.description) {
-        await nextVideo.createDescription(newVideo.description || defaultLocale);
+        await nextVideo.createDescription(
+          newVideo.description || defaultLocale,
+          { transaction },
+        );
       }
 
-
+      await transaction.commit();
     } catch(e) {
+      await transaction.rollback();
       ctx.body = e;
       ctx.status = 500;
       await next();
@@ -61,32 +73,38 @@ export default (router: any) => {
     await next();
   });
 
-  router.put('/videos/:id', auth(['admin']), async (ctx, next) => {
+  router.put('/videos/:id', auth(['admin']), async (ctx) => {
     const { id } = ctx.params;
     const { name, description, ...nextVideo } = ctx.request.body;
+    const transaction = await Video.sequelize.transaction();
+    try {
+      await Video.update(nextVideo, {
+        where: { id },
+      }, { transaction });
+      const video = await Video.findById(id);
 
-    await Video.update(nextVideo, {
-      where: { id },
-    });
-    const video = await Video.findById(id);
+      if (name) {
+        const videoName = await video.getName();
+        videoName.ru = name.ru;
+        videoName.en = name.en;
 
-    if (name) {
-      const videoName = await video.getName();
-      videoName.ru = name.ru;
-      videoName.en = name.en;
+        await videoName.save({ transaction });
+      }
+      if (video) {
+        const videoDescription = await video.getDescription();
+        videoDescription.ru = description.ru;
+        videoDescription.en = description.en;
 
-      await videoName.save();
+        await videoDescription.save({ transaction });
+      }
+
+      ctx.body = video;
+      transaction.commit();
+    } catch(e) {
+      ctx.body = e;
+      ctx.status = 400;
+      transaction.rollback();
     }
-    if (video) {
-      const videoDescription = await video.getDescription();
-      videoDescription.ru = description.ru;
-      videoDescription.en = description.en;
-
-      await videoDescription.save();
-    }
-
-    ctx.body = video;
-    await next();
   });
 
   router.get('/videos', async (ctx, next) => {
