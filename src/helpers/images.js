@@ -13,7 +13,7 @@ export async function getPreview(img) {
   const base64Data = extract(img);
 
   const jimpImg = await jimp.read(new Buffer(base64Data, 'base64'));
-  const preview = jimpImg.resize(400, 400);
+  const preview = jimpImg.cover(400, 400);
 
   return new Promise((res) => {
     preview.getBase64('image/png', (err, result) => {
