@@ -16,7 +16,7 @@ const app = new Koa();
 app.keys = ['secret'];
 
 async function launch() {
-  await sequelize.sync({ force: true });
+  await sequelize.sync();
   app
     .use(serve('public'))
     .use(cors())
