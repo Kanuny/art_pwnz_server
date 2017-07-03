@@ -166,9 +166,9 @@ export default (router: any) => {
 
     const articlesCount = await Article.count({
       where: {
-        removed: false || null
+        removed: false || null,
+        ...selectedFilter.query || {},
       },
-      ...selectedFilter.query || {},
     });
 
     ctx.body = {
