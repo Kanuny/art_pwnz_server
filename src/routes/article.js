@@ -164,7 +164,12 @@ export default (router: any) => {
       limit: pageSize,
     });
 
-    const articlesCount = await Article.count({ where: { removed: false || null } });
+    const articlesCount = await Article.count({
+      where: {
+        removed: false || null
+      },
+      ...selectedFilter.query || {},
+    });
 
     ctx.body = {
       articles,
